@@ -150,7 +150,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     async getWords() {
-      return (await (await fetch("/list.json")).json()).words;
+      return (await (await fetch("list.json")).json()).words;
     },
 
     getRandomWord() {
