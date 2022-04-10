@@ -1,0 +1,387 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css");
+:root {
+  --bg: #121416;
+}
+
+html {
+  background-color: var(--bg);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#keyboard {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 100%;
+  max-width: 33rem;
+  height: auto;
+  margin-bottom: 0.4rem;
+}
+
+#keyboard > .row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#keyboard > .row:nth-child(2) {
+  padding: 0 5%;
+}
+
+#keyboard > .row:nth-child(3) > button:first-child {
+  width: 20%;
+}
+
+#keyboard > .row:nth-child(3) > button:last-child {
+  width: 15%;
+}
+
+#keyboard > .row > button {
+  color: white;
+  width: 10%;
+  padding: 1.2rem 0.8rem;
+  margin: 0.25rem;
+  border-radius: 0.2rem;
+  font-weight: 700;
+  border: none;
+  background-color: gray;
+}
+
+#keyboard > .row > button:not(.incorrect) {
+  cursor: pointer;
+}
+
+#keyboard > .row > button.found {
+  background-color: #327732;
+}
+
+#keyboard > .row > button.misplaced {
+  background-color: #ac9e25;
+}
+
+#keyboard > .row > button.incorrect {
+  background-color: #353535;
+}
+
+header {
+  width: 100%;
+  border-bottom: rgba(192, 192, 192, 0.3) solid 2px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin: 0.6rem;
+  color: white;
+}
+
+#attempts {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 100%;
+  max-width: 20rem;
+  margin: auto 0;
+}
+
+#attempts > .row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 0.3rem 0;
+}
+
+#attempts > .row > div {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: rgba(192, 192, 192, 0.3) solid 2px;
+  color: white;
+  width: 25%;
+  height: 3.4rem;
+  margin: 0 0.3rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-size: 2rem;
+}
+
+#attempts > .row > div.typed {
+  border-color: #8a8a8a;
+}
+
+#attempts > .row > div.bubble {
+  -webkit-animation: bubble 0.15s ease-in-out;
+          animation: bubble 0.15s ease-in-out;
+}
+
+#attempts > .row.reveal > div {
+  -webkit-animation: reveal 0.5s forwards;
+          animation: reveal 0.5s forwards;
+  border: rgba(192, 192, 192, 0.3) solid 2px;
+  -webkit-transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out;
+  transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out;
+}
+
+#attempts > .row.reveal > div:nth-of-type(1) {
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+  -webkit-transition-delay: 0.2s, 0.2s;
+          transition-delay: 0.2s, 0.2s;
+}
+
+#attempts > .row.reveal > div:nth-of-type(2) {
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s;
+  -webkit-transition-delay: 0.3s, 0.3s;
+          transition-delay: 0.3s, 0.3s;
+}
+
+#attempts > .row.reveal > div:nth-of-type(3) {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s;
+  -webkit-transition-delay: 0.4s, 0.4s;
+          transition-delay: 0.4s, 0.4s;
+}
+
+#attempts > .row.reveal > div:nth-of-type(4) {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s;
+  -webkit-transition-delay: 0.5s, 0.5s;
+          transition-delay: 0.5s, 0.5s;
+}
+
+#attempts > .row.reveal > div:nth-of-type(5) {
+  -webkit-animation-delay: 0.4s;
+          animation-delay: 0.4s;
+  -webkit-transition-delay: 0.6s, 0.6s;
+          transition-delay: 0.6s, 0.6s;
+}
+
+#attempts > .row.reveal > div.filled {
+  background-color: gray;
+  border-color: rgba(0, 0, 0, 0);
+}
+
+#attempts > .row.reveal > div.found {
+  background-color: #327732;
+}
+
+#attempts > .row.reveal > div.misplaced {
+  background-color: #ac9e25;
+}
+
+#attempts > .row.shake {
+  -webkit-animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+          animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@-webkit-keyframes reveal {
+  from {
+    -webkit-transform: rotateX(0deg);
+            transform: rotateX(0deg);
+    background-color: unset;
+  }
+  50% {
+    -webkit-transform: rotateX(90deg);
+            transform: rotateX(90deg);
+  }
+  to {
+    -webkit-transform: rotateX(0);
+            transform: rotateX(0);
+  }
+}
+
+@keyframes reveal {
+  from {
+    -webkit-transform: rotateX(0deg);
+            transform: rotateX(0deg);
+    background-color: unset;
+  }
+  50% {
+    -webkit-transform: rotateX(90deg);
+            transform: rotateX(90deg);
+  }
+  to {
+    -webkit-transform: rotateX(0);
+            transform: rotateX(0);
+  }
+}
+
+@-webkit-keyframes shake {
+  10%,
+  90% {
+    -webkit-transform: translate3d(-1px, 0, 0);
+            transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    -webkit-transform: translate3d(2px, 0, 0);
+            transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    -webkit-transform: translate3d(-4px, 0, 0);
+            transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    -webkit-transform: translate3d(4px, 0, 0);
+            transform: translate3d(4px, 0, 0);
+  }
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    -webkit-transform: translate3d(-1px, 0, 0);
+            transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    -webkit-transform: translate3d(2px, 0, 0);
+            transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    -webkit-transform: translate3d(-4px, 0, 0);
+            transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    -webkit-transform: translate3d(4px, 0, 0);
+            transform: translate3d(4px, 0, 0);
+  }
+}
+
+@-webkit-keyframes bubble {
+  0% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+@keyframes bubble {
+  0% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+
+#alert {
+  z-index: 1000;
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+#alert > p {
+  font-size: 1.4rem;
+  border-radius: 0.4rem;
+  color: black;
+  background-color: white;
+  margin: 0.5rem 0;
+  padding: 1rem 1.2rem;
+}
+
+#win,
+#lost {
+  z-index: 10000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #3535355e;
+}
+
+#win div,
+#lost div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  font-size: 3rem;
+  background-color: #b4b4b4;
+  padding: 2rem;
+  border-radius: 1rem;
+}
+
+#win div button,
+#lost div button {
+  cursor: pointer;
+  color: white;
+  font-size: 2rem;
+  margin-top: 2rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.2rem;
+  border: none;
+  background-color: gray;
+}
+
+#win {
+  color: #327732;
+}
+
+#lost {
+  color: #773232;
+}
+/*# sourceMappingURL=style.css.map */

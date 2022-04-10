@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wordle-clone</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/main.js"></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.9.6/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body
+    x-data="wordleClone"
+    @keydown.enter="submitWord()"
+    @keydown.backspace="deleteLetter()"
+    @keydown="$event.key.length === 1 && addLetter($event.key.toUpperCase())"
+  >
+    <header>
+      <h1>Tama-Wordle</h1>
+    </header>
+
+    <template x-if="win">
+      <div id="win">
+        <div>
+          You won <br />
+          <button @click="playAgain()">Play again</button>
+        </div>
+      </div>
+    </template>
+
+    <template x-if="lost">
+      <div id="lost">
+        <div>
+          You failed, <br />
+          the word was <span x-text="word"></span> <br />
+
+          <button @click="playAgain()">Play again</button>
+        </div>
+      </div>
+    </template>
+
+    <div id="alert">
+      <template x-for="alert in alerts" :key="alert.id">
+        <p x-text="alert.message"></p>
+      </template>
+    </div>
+
+    <div id="attempts">
+      <div class="row" x-ref="attempt-1">
+        <div x-text="handleText(1,0)" :class="textClass(1,0)"></div>
+        <div x-text="handleText(1,1)" :class="textClass(1,1)"></div>
+        <div x-text="handleText(1,2)" :class="textClass(1,2)"></div>
+        <div x-text="handleText(1,3)" :class="textClass(1,3)"></div>
+        <div x-text="handleText(1,4)" :class="textClass(1,4)"></div>
+      </div>
+      <div class="row" x-ref="attempt-2">
+        <div x-text="handleText(2,0)" :class="textClass(2,0)"></div>
+        <div x-text="handleText(2,1)" :class="textClass(2,1)"></div>
+        <div x-text="handleText(2,2)" :class="textClass(2,2)"></div>
+        <div x-text="handleText(2,3)" :class="textClass(2,3)"></div>
+        <div x-text="handleText(2,4)" :class="textClass(2,4)"></div>
+      </div>
+      <div class="row" x-ref="attempt-3">
+        <div x-text="handleText(3,0)" :class="textClass(3,0)"></div>
+        <div x-text="handleText(3,1)" :class="textClass(3,1)"></div>
+        <div x-text="handleText(3,2)" :class="textClass(3,2)"></div>
+        <div x-text="handleText(3,3)" :class="textClass(3,3)"></div>
+        <div x-text="handleText(3,4)" :class="textClass(3,4)"></div>
+      </div>
+      <div class="row" x-ref="attempt-4">
+        <div x-text="handleText(4,0)" :class="textClass(4,0)"></div>
+        <div x-text="handleText(4,1)" :class="textClass(4,1)"></div>
+        <div x-text="handleText(4,2)" :class="textClass(4,2)"></div>
+        <div x-text="handleText(4,3)" :class="textClass(4,3)"></div>
+        <div x-text="handleText(4,4)" :class="textClass(4,4)"></div>
+      </div>
+      <div class="row" x-ref="attempt-5">
+        <div x-text="handleText(5,0)" :class="textClass(5,0)"></div>
+        <div x-text="handleText(5,1)" :class="textClass(5,1)"></div>
+        <div x-text="handleText(5,2)" :class="textClass(5,2)"></div>
+        <div x-text="handleText(5,3)" :class="textClass(5,3)"></div>
+        <div x-text="handleText(5,4)" :class="textClass(5,4)"></div>
+      </div>
+      <div class="row" x-ref="attempt-6">
+        <div x-text="handleText(6,0)" :class="textClass(6,0)"></div>
+        <div x-text="handleText(6,1)" :class="textClass(6,1)"></div>
+        <div x-text="handleText(6,2)" :class="textClass(6,2)"></div>
+        <div x-text="handleText(6,3)" :class="textClass(6,3)"></div>
+        <div x-text="handleText(6,4)" :class="textClass(6,4)"></div>
+      </div>
+    </div>
+    <div id="keyboard">
+      <div class="row">
+        <button @click="addLetter('Q')" :class="kbdClass('Q')">Q</button>
+        <button @click="addLetter('W')" :class="kbdClass('W')">W</button>
+        <button @click="addLetter('E')" :class="kbdClass('E')">E</button>
+        <button @click="addLetter('R')" :class="kbdClass('R')">R</button>
+        <button @click="addLetter('T')" :class="kbdClass('T')">T</button>
+        <button @click="addLetter('Y')" :class="kbdClass('Y')">Y</button>
+        <button @click="addLetter('U')" :class="kbdClass('U')">U</button>
+        <button @click="addLetter('I')" :class="kbdClass('I')">I</button>
+        <button @click="addLetter('O')" :class="kbdClass('O')">O</button>
+        <button @click="addLetter('P')" :class="kbdClass('P')">P</button>
+      </div>
+      <div class="row">
+        <button @click="addLetter('A')" :class="kbdClass('A')">A</button>
+        <button @click="addLetter('S')" :class="kbdClass('S')">S</button>
+        <button @click="addLetter('D')" :class="kbdClass('D')">D</button>
+        <button @click="addLetter('F')" :class="kbdClass('F')">F</button>
+        <button @click="addLetter('G')" :class="kbdClass('G')">G</button>
+        <button @click="addLetter('H')" :class="kbdClass('H')">H</button>
+        <button @click="addLetter('J')" :class="kbdClass('J')">J</button>
+        <button @click="addLetter('K')" :class="kbdClass('K')">K</button>
+        <button @click="addLetter('L')" :class="kbdClass('L')">L</button>
+      </div>
+      <div class="row">
+        <button @click.throttle="submitWord()">enter</button>
+        <button @click="addLetter('Z')" :class="kbdClass('Z')">Z</button>
+        <button @click="addLetter('X')" :class="kbdClass('X')">X</button>
+        <button @click="addLetter('C')" :class="kbdClass('C')">C</button>
+        <button @click="addLetter('V')" :class="kbdClass('V')">V</button>
+        <button @click="addLetter('B')" :class="kbdClass('B')">B</button>
+        <button @click="addLetter('N')" :class="kbdClass('N')">N</button>
+        <button @click="addLetter('M')" :class="kbdClass('M')">M</button>
+        <button @click.throttle="deleteLetter()">del</button>
+      </div>
+    </div>
+  </body>
+</html>
