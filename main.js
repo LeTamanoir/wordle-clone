@@ -1,183 +1,229 @@
+//prettier-ignore
+let letters = [
+  "Q","W","E","R","T","Y","U","I","O","P",
+    "A","S","D","F","G","H","J","K","L",
+        "Z","X","C","V","B","N","M"
+];
+
 document.addEventListener("alpine:init", () => {
   Alpine.data("wordleClone", () => ({
-    async init() {
-      this.words = await this.getWords();
-      this.word = this.getRandomWord();
-    },
-    word: "",
-    words: [],
-    guess: "",
-    win: false,
-    lost: false,
-    found: new Set(),
-    misplaced: new Set(),
-    incorrect: new Set(),
+    letters,
+    keys: Object.fromEntries(
+      letters.map((key) => [
+        key,
+        {
+          correct: false,
+          misplaced: false,
+          incorrect: false,
+        },
+      ])
+    ),
+
+    guesses: [...Array(6)].map(() => ({
+      shake: false,
+      reveal: false,
+      success: false,
+      letters: [...Array(5)].map((_, _id) => ({
+        text: "",
+        _id,
+        class: {
+          reveal: false,
+          bubble: false,
+          active: false,
+          correct: false,
+          misplaced: false,
+          incorrect: false,
+        },
+      })),
+    })),
+
     alerts: [],
-    attempt_id: 1,
-    attempts: [],
+    secrect_word: "",
+    words: [],
+    current_row: 0,
+    current_letter: 0,
 
-    addLetter(letter) {
-      if (this.attempt_id > 6) return;
-
-      let _len = this.guess.length;
-      if (_len < 5) {
-        this.guess += letter;
-
-        this.$refs[`attempt-${this.attempt_id}`].children[_len].classList.add(
-          "bubble",
-          "typed"
-        );
-
-        setTimeout(() => {
-          if (this.attempt_id > 6) return;
-
-          this.$refs[`attempt-${this.attempt_id}`].children[
-            _len
-          ].classList.remove("bubble");
-        }, 500);
-      }
+    modal: {
+      show: false,
+      text: "",
+      destroy() {
+        this.show = false;
+        this.text = "";
+      },
     },
 
-    handleText(att_id, place_id) {
-      if (att_id === this.attempt_id) {
-        return this.guess.at(place_id) ?? "";
-      }
-
-      if (att_id < this.attempt_id) {
-        return JSON.parse(JSON.stringify(this.attempts))[att_id - 1][place_id];
-      }
-    },
-
-    textClass(att_id, place_id) {
-      if (att_id < this.attempt_id) {
-        let row = JSON.parse(JSON.stringify(this.attempts))[att_id - 1];
-        let letter = row[place_id];
-
-        if (this.word.includes(letter)) {
-          if (letter === this.word[place_id]) {
-            return "filled found";
-          }
-
-          if (place_id !== this.word.indexOf(letter)) {
-            return "filled misplaced";
-          }
-        }
-
-        return "filled";
-      }
-    },
-
-    shake() {
-      if (this.attempt_id > 6) return;
-
-      let _id = Date.now();
-
-      this.$refs[`attempt-${this.attempt_id}`].classList.add("shake");
-      setTimeout(() => {
-        if (this.attempt_id > 6) return;
-        this.$refs[`attempt-${this.attempt_id}`].classList.remove("shake");
-      }, 500);
-
-      if (this.alerts.length < 6) {
-        this.alerts.push({ message: "Not enough letters", id: _id });
-        setTimeout(() => {
-          this.alerts = this.alerts.filter((al) => al.id !== _id);
-        }, 2000);
-      }
-    },
-
-    submitWord() {
-      if (this.attempt_id > 6) return;
-
-      if (this.guess.length !== this.word.length) {
-        this.shake();
-        return;
-      }
-
-      for (letter of this.guess) {
-        if (this.word.includes(letter)) {
-          if (this.word.indexOf(letter) === this.guess.indexOf(letter)) {
-            this.found.add(letter);
-          } else {
-            this.misplaced.add(letter);
-          }
-        } else {
-          this.incorrect.add(letter);
+    replay() {
+      for (let _row = 0; _row < 6; _row++) {
+        this.guesses[_row].reveal = false;
+        this.guesses[_row].success = false;
+        this.guesses[_row].shake = false;
+        for (let _letter = 0; _letter < 5; _letter++) {
+          this.guesses[_row].letters[_letter].class = {
+            reveal: false,
+            bubble: false,
+            active: false,
+            correct: false,
+            misplaced: false,
+            incorrect: false,
+          };
+          this.guesses[_row].letters[_letter].text = "";
         }
       }
 
-      let _guess = this.guess;
-      this.attempts.push([...this.guess]);
-      this.guess = "";
-      this.handleTransition();
-
-      if (this.word === _guess) {
-        setTimeout(() => {
-          this.win = true;
-        }, 1100);
-      } else if (this.attempt_id === 6) {
-        setTimeout(() => {
-          this.lost = true;
-        }, 1100);
-      }
-
-      this.attempt_id += 1;
-    },
-
-    handleTransition() {
-      if (this.attempt_id > 6) return;
-
-      this.$refs[`attempt-${this.attempt_id}`].classList.add("reveal");
-    },
-
-    kbdClass(letter) {
-      return this.found.has(letter)
-        ? "found"
-        : this.misplaced.has(letter)
-        ? "misplaced"
-        : this.incorrect.has(letter)
-        ? "incorrect"
-        : "";
-    },
-
-    deleteLetter() {
-      if (this.attempt_id > 6) return;
-
-      this.guess = this.guess.slice(0, -1);
-      this.$refs[`attempt-${this.attempt_id}`].children[
-        this.guess.length
-      ].classList.remove("typed");
-    },
-
-    async getWords() {
-      return (await (await fetch("list.json")).json()).words;
+      this.modal.destroy();
+      this.secrect_word = this.getRandomWord();
+      this.current_row = 0;
+      this.current_letter = 0;
     },
 
     getRandomWord() {
-      let word = this.words[Math.floor(Math.random() * 212)];
-      console.log(word);
-      return word;
+      return this.words[Math.floor(this.words.length * Math.random())];
     },
 
-    playAgain() {
-      this.word = this.getRandomWord();
-      this.guess = "";
-      this.win = false;
-      this.lost = false;
-      this.found = new Set();
-      this.misplaced = new Set();
-      this.incorrect = new Set();
-      this.alerts = [];
-      this.attempt_id = 1;
-      this.attempts = [];
+    async init() {
+      const { words } = await (await fetch("list.json")).json();
+      this.words = words;
+      this.secrect_word = words[Math.floor(words.length * Math.random())];
+    },
 
-      for (let i = 1; i < 7; i++) {
-        this.$refs[`attempt-${i}`].classList.remove("reveal", "shake");
+    handleKey(e) {
+      if (this.modal.show) return;
+      let key = e.key.toUpperCase();
+      if (this.letters.includes(key)) this.addKey(key);
+      else if (e.key === "Backspace") this.deleteLetter();
+      else if (e.key === "Enter") this.submitWord();
+    },
 
-        for (child of this.$refs[`attempt-${i}`].children) {
-          child.classList.remove("typed");
+    addKey(key) {
+      if (this.guesses[this.current_row].reveal) return;
+
+      if (
+        this.guesses[this.current_row].letters[this.current_letter].text !== ""
+      ) {
+        if (this.current_letter < 4) this.current_letter++;
+        else return;
+      }
+
+      let _row = this.current_row;
+      let _letter = this.current_letter;
+
+      this.guesses[_row].letters[_letter].class.bubble = true;
+      this.guesses[_row].letters[_letter].class.active = true;
+      this.guesses[_row].letters[_letter].text = key;
+      if (this.current_letter < 4) this.current_letter++;
+    },
+
+    submitWord() {
+      if (this.guesses[this.current_row].reveal) return;
+
+      let _row = this.current_row;
+      let _secret_helper = this.secrect_word;
+      let keys_to_change = [];
+      let win_count = 0;
+
+      for (let letter of this.guesses[_row].letters) {
+        if (letter.text === "") {
+          this.guesses[_row].shake = false;
+          this.$nextTick(() => (this.guesses[_row].shake = true));
+          return;
         }
       }
+
+      let _guess = this.guesses[_row].letters.reduce(
+        (prev, letter) => prev + letter.text,
+        ""
+      );
+
+      if (!this.words.includes(_guess)) {
+        this.guesses[_row].shake = false;
+        this.$nextTick(() => (this.guesses[_row].shake = true));
+
+        this.addAlert("Not in word list");
+        return;
+      }
+
+      this.guesses[_row].reveal = true;
+
+      for (let i = 0; i < 5; i++) {
+        let letter = this.guesses[_row].letters[i].text;
+        let secret_letter = this.secrect_word[i];
+
+        if (letter === secret_letter) {
+          win_count++;
+          this.guesses[_row].letters[i].class.correct = true;
+          _secret_helper = _secret_helper.replace(letter, "");
+        }
+        //
+        else if (_secret_helper.includes(letter)) {
+          this.guesses[_row].letters[i].class.misplaced = true;
+          _secret_helper = _secret_helper.replace(letter, "");
+        }
+        //
+        else {
+          this.guesses[_row].letters[i].class.incorrect = true;
+          keys_to_change.push(letter);
+        }
+      }
+
+      setTimeout(() => {
+        keys_to_change.forEach((key) => {
+          this.keys[key].incorrect = true;
+        });
+
+        if (win_count === 5) {
+          this.guesses[_row].success = true;
+          this.addAlert("Genius");
+
+          setTimeout(() => {
+            this.handleWin();
+          }, 500);
+        } else if (this.current_row === 5) {
+          this.handleLose();
+        } else {
+          this.current_row++;
+          this.current_letter = 0;
+        }
+      }, 2000);
+    },
+
+    addAlert(message) {
+      let _id = Date.now();
+      this.alerts.push({ message, _id });
+
+      setTimeout(() => {
+        this.alerts = this.alerts.filter((e) => e._id !== _id);
+      }, 3000);
+    },
+
+    handleWin() {
+      this.modal.text = "You won 🏆";
+      this.modal.show = true;
+    },
+
+    resetGame() {},
+
+    handleLose() {
+      this.modal.text = `You lost 😕, the word was : ${this.secrect_word}`;
+      this.modal.show = true;
+    },
+
+    deleteLetter() {
+      if (this.guesses[this.current_row].reveal) return;
+
+      if (
+        this.guesses[this.current_row].letters[this.current_letter].text === ""
+      ) {
+        if (this.current_letter > 0) this.current_letter--;
+        else return;
+      }
+
+      let _row = this.current_row;
+      let _letter = this.current_letter;
+
+      this.guesses[_row].letters[_letter].class.bubble = false;
+      this.guesses[_row].letters[_letter].class.active = false;
+      this.guesses[_row].letters[_letter].text = "";
+      if (this.current_letter > 0) this.current_letter--;
     },
   }));
 });
