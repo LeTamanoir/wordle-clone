@@ -70,6 +70,12 @@ document.addEventListener("alpine:init", () => {
         }
       }
 
+      this.letters.forEach((l) => {
+        this.keys[l].correct = false;
+        this.keys[l].misplaced = false;
+        this.keys[l].incorrect = false;
+      });
+
       this.modal.destroy();
       this.secrect_word = this.getRandomWord();
       this.current_row = 0;
@@ -118,8 +124,9 @@ document.addEventListener("alpine:init", () => {
 
       let _row = this.current_row;
       let _secret_helper = this.secrect_word;
+      let _correct_index_helper = [];
       let keys_to_change = [];
-      let win_count = 0;
+      let win = true;
 
       for (let letter of this.guesses[_row].letters) {
         if (letter.text === "") {
@@ -149,17 +156,21 @@ document.addEventListener("alpine:init", () => {
         let secret_letter = this.secrect_word[i];
 
         if (letter === secret_letter) {
-          win_count++;
           this.guesses[_row].letters[i].class.correct = true;
+          _correct_index_helper.push(i);
           _secret_helper = _secret_helper.replace(letter, "");
+        } else {
+          win = false;
         }
-        //
-        else if (_secret_helper.includes(letter)) {
+      }
+
+      for (let i = 0; i < 5; i++) {
+        let letter = this.guesses[_row].letters[i].text;
+
+        if (_secret_helper.includes(letter)) {
           this.guesses[_row].letters[i].class.misplaced = true;
           _secret_helper = _secret_helper.replace(letter, "");
-        }
-        //
-        else {
+        } else if (!_correct_index_helper.includes(i)) {
           this.guesses[_row].letters[i].class.incorrect = true;
           keys_to_change.push(letter);
         }
@@ -170,7 +181,7 @@ document.addEventListener("alpine:init", () => {
           this.keys[key].incorrect = true;
         });
 
-        if (win_count === 5) {
+        if (win) {
           this.guesses[_row].success = true;
           this.addAlert("Genius");
 
