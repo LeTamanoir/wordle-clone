@@ -60,6 +60,8 @@ h1 {
   text-transform: capitalize;
   border-radius: 0.2em;
   border: none;
+
+  user-select: none;
 }
 
 .key.action {
@@ -113,6 +115,8 @@ h1 {
 
   border: solid 0.1em var(--border-letter, rgb(58, 58, 60));
   background-color: var(--bg-letter, var(--bg-site));
+
+  user-select: none;
 }
 
 .row.reveal .letter {
