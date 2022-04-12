@@ -38,7 +38,7 @@ document.addEventListener("alpine:init", () => {
     })),
 
     alerts: [],
-    secrect_word: "TEPEE",
+    secrect_word: "",
     words: [],
     current_row: 0,
     current_letter: 0,
@@ -89,7 +89,7 @@ document.addEventListener("alpine:init", () => {
     async init() {
       const { words } = await (await fetch("list.json")).json();
       this.words = words;
-      // this.secrect_word = words[Math.floor(words.length * Math.random())];
+      this.secrect_word = words[Math.floor(words.length * Math.random())];
     },
 
     handleKey(e) {
