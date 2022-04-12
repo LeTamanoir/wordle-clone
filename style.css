@@ -71,17 +71,17 @@ h1 {
   grid-column: span 0.5;
 }
 
-.key.correct {
+.key.incorrect {
   cursor: default;
-  --bg-key: rgb(83, 141, 78);
+  --bg-key: rgb(58, 58, 60);
 }
 .key.misplaced {
   cursor: default;
   --bg-key: rgb(181, 159, 59);
 }
-.key.incorrect {
+.key.correct {
   cursor: default;
-  --bg-key: rgb(58, 58, 60);
+  --bg-key: rgb(83, 141, 78);
 }
 
 #board {
@@ -170,17 +170,17 @@ h1 {
 .letter.active {
   --border-letter: rgb(86, 87, 88);
 }
-.letter.correct {
-  --border-letter: rgb(83, 141, 78);
-  --bg-letter: rgb(83, 141, 78);
+.letter.incorrect {
+  --border-letter: rgb(58, 58, 60);
+  --bg-letter: rgb(58, 58, 60);
 }
 .letter.misplaced {
   --border-letter: rgb(181, 159, 59);
   --bg-letter: rgb(181, 159, 59);
 }
-.letter.incorrect {
-  --border-letter: rgb(58, 58, 60);
-  --bg-letter: rgb(58, 58, 60);
+.letter.correct {
+  --border-letter: rgb(83, 141, 78);
+  --bg-letter: rgb(83, 141, 78);
 }
 
 #modal {

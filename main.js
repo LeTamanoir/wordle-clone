@@ -14,8 +14,8 @@ document.addEventListener("alpine:init", () => {
         {
           correct: false,
           misplaced: false,
-          incorrect: false
-        }
+          incorrect: false,
+        },
       ])
     ),
 
@@ -32,9 +32,9 @@ document.addEventListener("alpine:init", () => {
           active: false,
           correct: false,
           misplaced: false,
-          incorrect: false
-        }
-      }))
+          incorrect: false,
+        },
+      })),
     })),
 
     alerts: [],
@@ -49,7 +49,7 @@ document.addEventListener("alpine:init", () => {
       destroy() {
         this.show = false;
         this.text = "";
-      }
+      },
     },
 
     replay() {
@@ -64,7 +64,7 @@ document.addEventListener("alpine:init", () => {
             active: false,
             correct: false,
             misplaced: false,
-            incorrect: false
+            incorrect: false,
           };
           this.guesses[_row].letters[_letter].text = "";
         }
@@ -125,7 +125,7 @@ document.addEventListener("alpine:init", () => {
       let _row = this.current_row;
       let _secret_helper = this.secrect_word;
       let _correct_index_helper = [];
-      let keys_to_change = { correct: [], misplaced: [], incorrect: [] };
+      let _keys_helper = { incorrect: [], misplaced: [], correct: [] };
       let win = true;
 
       for (let letter of this.guesses[_row].letters) {
@@ -163,7 +163,7 @@ document.addEventListener("alpine:init", () => {
           this.guesses[_row].letters[i].class.correct = true;
           _correct_index_helper.push(i);
           _secret_helper = _secret_helper.replace(letter, "");
-          keys_to_change.correct.push(letter);
+          _keys_helper.correct.push(letter);
         } else {
           win = false;
         }
@@ -177,8 +177,8 @@ document.addEventListener("alpine:init", () => {
             this.guesses[_row].letters[i].class.misplaced = true;
             _secret_helper = _secret_helper.replace(letter, "");
 
-            if (!keys_to_change.correct.includes(letter)) {
-              keys_to_change.misplaced.push(letter);
+            if (!_keys_helper.correct.includes(letter)) {
+              _keys_helper.misplaced.push(letter);
             }
           }
           //
@@ -186,20 +186,18 @@ document.addEventListener("alpine:init", () => {
             this.guesses[_row].letters[i].class.incorrect = true;
 
             if (
-              !keys_to_change.correct.includes(letter) &&
-              !keys_to_change.misplaced.includes(letter)
+              !_keys_helper.correct.includes(letter) &&
+              !_keys_helper.misplaced.includes(letter)
             ) {
-              keys_to_change.incorrect.push(letter);
+              _keys_helper.incorrect.push(letter);
             }
           }
         }
       }
 
       setTimeout(() => {
-        Object.keys(keys_to_change).forEach((key) => {
-          keys_to_change[key].forEach((k) => {
-            this.keys[k][key] = true;
-          });
+        Object.keys(_keys_helper).forEach((key) => {
+          _keys_helper[key].forEach((k) => (this.keys[k][key] = true));
         });
 
         if (win) {
@@ -208,7 +206,7 @@ document.addEventListener("alpine:init", () => {
 
           setTimeout(() => {
             this.handleWin();
-          }, 500);
+          }, 1000);
         } else if (this.current_row === 5) {
           this.handleLose();
         } else {
@@ -254,6 +252,6 @@ document.addEventListener("alpine:init", () => {
       this.guesses[_row].letters[_letter].class.active = false;
       this.guesses[_row].letters[_letter].text = "";
       if (this.current_letter > 0) this.current_letter--;
-    }
+    },
   }));
 });
