@@ -14,8 +14,8 @@ document.addEventListener("alpine:init", () => {
         {
           correct: false,
           misplaced: false,
-          incorrect: false,
-        },
+          incorrect: false
+        }
       ])
     ),
 
@@ -32,13 +32,13 @@ document.addEventListener("alpine:init", () => {
           active: false,
           correct: false,
           misplaced: false,
-          incorrect: false,
-        },
-      })),
+          incorrect: false
+        }
+      }))
     })),
 
     alerts: [],
-    secrect_word: "",
+    secrect_word: "TEPEE",
     words: [],
     current_row: 0,
     current_letter: 0,
@@ -49,7 +49,7 @@ document.addEventListener("alpine:init", () => {
       destroy() {
         this.show = false;
         this.text = "";
-      },
+      }
     },
 
     replay() {
@@ -64,7 +64,7 @@ document.addEventListener("alpine:init", () => {
             active: false,
             correct: false,
             misplaced: false,
-            incorrect: false,
+            incorrect: false
           };
           this.guesses[_row].letters[_letter].text = "";
         }
@@ -89,7 +89,7 @@ document.addEventListener("alpine:init", () => {
     async init() {
       const { words } = await (await fetch("list.json")).json();
       this.words = words;
-      this.secrect_word = words[Math.floor(words.length * Math.random())];
+      // this.secrect_word = words[Math.floor(words.length * Math.random())];
     },
 
     handleKey(e) {
@@ -125,13 +125,15 @@ document.addEventListener("alpine:init", () => {
       let _row = this.current_row;
       let _secret_helper = this.secrect_word;
       let _correct_index_helper = [];
-      let keys_to_change = [];
+      let keys_to_change = { correct: [], misplaced: [], incorrect: [] };
       let win = true;
 
       for (let letter of this.guesses[_row].letters) {
         if (letter.text === "") {
-          this.guesses[_row].shake = false;
-          this.$nextTick(() => (this.guesses[_row].shake = true));
+          this.guesses[_row].shake = true;
+          setTimeout(() => {
+            this.guesses[_row].shake = false;
+          }, 800);
           return;
         }
       }
@@ -142,8 +144,10 @@ document.addEventListener("alpine:init", () => {
       );
 
       if (!this.words.includes(_guess)) {
-        this.guesses[_row].shake = false;
-        this.$nextTick(() => (this.guesses[_row].shake = true));
+        this.guesses[_row].shake = true;
+        setTimeout(() => {
+          this.guesses[_row].shake = false;
+        }, 1000);
 
         this.addAlert("Not in word list");
         return;
@@ -159,6 +163,7 @@ document.addEventListener("alpine:init", () => {
           this.guesses[_row].letters[i].class.correct = true;
           _correct_index_helper.push(i);
           _secret_helper = _secret_helper.replace(letter, "");
+          keys_to_change.correct.push(letter);
         } else {
           win = false;
         }
@@ -167,18 +172,34 @@ document.addEventListener("alpine:init", () => {
       for (let i = 0; i < 5; i++) {
         let letter = this.guesses[_row].letters[i].text;
 
-        if (_secret_helper.includes(letter)) {
-          this.guesses[_row].letters[i].class.misplaced = true;
-          _secret_helper = _secret_helper.replace(letter, "");
-        } else if (!_correct_index_helper.includes(i)) {
-          this.guesses[_row].letters[i].class.incorrect = true;
-          keys_to_change.push(letter);
+        if (!_correct_index_helper.includes(i)) {
+          if (_secret_helper.includes(letter)) {
+            this.guesses[_row].letters[i].class.misplaced = true;
+            _secret_helper = _secret_helper.replace(letter, "");
+
+            if (!keys_to_change.correct.includes(letter)) {
+              keys_to_change.misplaced.push(letter);
+            }
+          }
+          //
+          else {
+            this.guesses[_row].letters[i].class.incorrect = true;
+
+            if (
+              !keys_to_change.correct.includes(letter) &&
+              !keys_to_change.misplaced.includes(letter)
+            ) {
+              keys_to_change.incorrect.push(letter);
+            }
+          }
         }
       }
 
       setTimeout(() => {
-        keys_to_change.forEach((key) => {
-          this.keys[key].incorrect = true;
+        Object.keys(keys_to_change).forEach((key) => {
+          keys_to_change[key].forEach((k) => {
+            this.keys[k][key] = true;
+          });
         });
 
         if (win) {
@@ -211,8 +232,6 @@ document.addEventListener("alpine:init", () => {
       this.modal.show = true;
     },
 
-    resetGame() {},
-
     handleLose() {
       this.modal.text = `You lost 😕, the word was : ${this.secrect_word}`;
       this.modal.show = true;
@@ -235,6 +254,6 @@ document.addEventListener("alpine:init", () => {
       this.guesses[_row].letters[_letter].class.active = false;
       this.guesses[_row].letters[_letter].text = "";
       if (this.current_letter > 0) this.current_letter--;
-    },
+    }
   }));
 });
