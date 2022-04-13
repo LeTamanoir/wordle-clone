@@ -19,13 +19,15 @@ document.addEventListener("alpine:init", () => {
       ])
     ),
 
-    guesses: [...Array(6)].map(() => ({
-      shake: false,
-      reveal: false,
-      success: false,
-      letters: [...Array(5)].map((_, _id) => ({
+    guesses: [...Array(6)].map((_, _id_1) => ({
+      class: {
+        shake: false,
+        reveal: false,
+        success: false,
+      },
+      letters: [...Array(5)].map((_, _id_2) => ({
         text: "",
-        _id,
+        _id: _id_2,
         class: {
           reveal: false,
           bubble: false,
@@ -35,6 +37,7 @@ document.addEventListener("alpine:init", () => {
           incorrect: false,
         },
       })),
+      _id: _id_1,
     })),
 
     alerts: [],
@@ -54,9 +57,9 @@ document.addEventListener("alpine:init", () => {
 
     replay() {
       for (let _row = 0; _row < 6; _row++) {
-        this.guesses[_row].reveal = false;
-        this.guesses[_row].success = false;
-        this.guesses[_row].shake = false;
+        this.guesses[_row].class.reveal = false;
+        this.guesses[_row].class.success = false;
+        this.guesses[_row].class.shake = false;
         for (let _letter = 0; _letter < 5; _letter++) {
           this.guesses[_row].letters[_letter].class = {
             reveal: false,
@@ -101,7 +104,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     addKey(key) {
-      if (this.guesses[this.current_row].reveal) return;
+      if (this.guesses[this.current_row].class.reveal) return;
 
       if (
         this.guesses[this.current_row].letters[this.current_letter].text !== ""
@@ -120,7 +123,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     submitWord() {
-      if (this.guesses[this.current_row].reveal) return;
+      if (this.guesses[this.current_row].class.reveal) return;
 
       let _row = this.current_row;
       let _secret_helper = this.secrect_word;
@@ -130,10 +133,14 @@ document.addEventListener("alpine:init", () => {
 
       for (let letter of this.guesses[_row].letters) {
         if (letter.text === "") {
-          this.guesses[_row].shake = true;
-          setTimeout(() => {
-            this.guesses[_row].shake = false;
-          }, 800);
+          this.guesses[_row].class.shake = true;
+
+          document
+            .querySelector(`#row_${_row}`)
+            .addEventListener("animationend", () => {
+              this.guesses[_row].class.shake = false;
+            });
+
           return;
         }
       }
@@ -144,16 +151,18 @@ document.addEventListener("alpine:init", () => {
       );
 
       if (!this.words.includes(_guess)) {
-        this.guesses[_row].shake = true;
-        setTimeout(() => {
-          this.guesses[_row].shake = false;
-        }, 1000);
+        this.guesses[_row].class.shake = true;
+        document
+          .querySelector(`#row_${_row}`)
+          .addEventListener("animationend", () => {
+            this.guesses[_row].class.shake = false;
+          });
 
         this.addAlert("Not in word list");
         return;
       }
 
-      this.guesses[_row].reveal = true;
+      this.guesses[_row].class.reveal = true;
 
       for (let i = 0; i < 5; i++) {
         let letter = this.guesses[_row].letters[i].text;
@@ -201,12 +210,10 @@ document.addEventListener("alpine:init", () => {
         });
 
         if (win) {
-          this.guesses[_row].success = true;
+          this.guesses[_row].class.success = true;
           this.addAlert("Genius");
 
-          setTimeout(() => {
-            this.handleWin();
-          }, 1000);
+          setTimeout(() => this.handleWin(), 1000);
         } else if (this.current_row === 5) {
           this.handleLose();
         } else {
@@ -236,7 +243,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     deleteLetter() {
-      if (this.guesses[this.current_row].reveal) return;
+      if (this.guesses[this.current_row].class.reveal) return;
 
       if (
         this.guesses[this.current_row].letters[this.current_letter].text === ""

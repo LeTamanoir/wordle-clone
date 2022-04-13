@@ -31,16 +31,9 @@
     </div>
 
     <main id="board">
-      <template x-for="(guess, _id_1) in guesses" :key="_id_1">
-        <div
-          class="row"
-          :class="{
-            'shake': guess.shake,
-            'reveal': guess.reveal,
-            'success': guess.success
-          }"
-        >
-          <template x-for="(letter, _id_2) in guess.letters" :key="_id_2">
+      <template x-for="guess in guesses" :key="guess._id">
+        <div class="row" :class="guess.class" :id="`row_${guess._id}`">
+          <template x-for="letter in guess.letters" :key="letter._id">
             <div
               class="letter"
               x-text="letter.text"
