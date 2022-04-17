@@ -43,6 +43,7 @@ document.addEventListener("alpine:init", () => {
     alerts: [],
     secrect_word: "",
     words: [],
+    allowed: [],
     current_row: 0,
     current_letter: 0,
 
@@ -91,7 +92,9 @@ document.addEventListener("alpine:init", () => {
 
     async init() {
       const { words } = await (await fetch("list.json")).json();
+      const { allowed } = await (await fetch("allowed.json")).json();
       this.words = words;
+      this.allowed = allowed;
       this.secrect_word = words[Math.floor(words.length * Math.random())];
     },
 
@@ -150,7 +153,7 @@ document.addEventListener("alpine:init", () => {
         ""
       );
 
-      if (!this.words.includes(_guess)) {
+      if (!this.allowed.includes(_guess)) {
         this.guesses[_row].class.shake = true;
         document
           .querySelector(`#row_${_row}`)
