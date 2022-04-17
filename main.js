@@ -153,7 +153,7 @@ document.addEventListener("alpine:init", () => {
         ""
       );
 
-      if (!this.allowed.includes(_guess)) {
+      if (!this.allowed.includes(_guess) && !this.words.includes(_guess)) {
         this.guesses[_row].class.shake = true;
         document
           .querySelector(`#row_${_row}`)
